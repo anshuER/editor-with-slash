@@ -159,6 +159,7 @@ export const withMention = <
 
     if (operation.type === "insert_text" || operation.type === "remove_text") {
       const currentMentionInput = findMentionInput(editor);
+      console.log("currentMentionInput-", currentMentionInput);
       // operation.node = {
       //   type: "h1",
       //   children: [{ text: "anshu" }],
@@ -176,11 +177,11 @@ export const withMention = <
       //   children: [{ text: "" }],
       // } as TMentionElement);
       if (currentMentionInput) {
-        // comboboxActions.text(getNodeString(currentMentionInput[0]));
-        insertNodes<TMentionElement>(editor, {
-          type,
-          children: [{ text: "", [`${currentMentionInput[0]}`]: true }],
-        } as TMentionElement);
+        comboboxActions.text(getNodeString(currentMentionInput[0]));
+        // insertNodes<TMentionElement>(editor, {
+        //   type,
+        //   children: [{ text: "", [`${currentMentionInput[0]}`]: true }],
+        // } as TMentionElement);
       }
     } else if (operation.type === "set_selection") {
       const previousMentionInputPath = Range.isRange(operation.properties)
@@ -197,6 +198,8 @@ export const withMention = <
         // getmentoinonselecteditem
         removeMentionInput(editor, previousMentionInputPath);
       }
+
+      console.log("currentMentionInputPath-", currentMentionInputPath);
 
       if (currentMentionInputPath) {
         comboboxActions.targetRange(editor.selection);
