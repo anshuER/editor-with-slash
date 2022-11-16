@@ -5,8 +5,8 @@ import { jsx } from "@udecode/plate-test-utils";
 
 jsx;
 
-export const mentionValue: any = (
+export const mentionValue2: any = (
   <fragment>
-    <hp>💬 Mention</hp>
+    <hp>💬 Mention2</hp>
   </fragment>
 );

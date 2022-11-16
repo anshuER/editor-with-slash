@@ -34,6 +34,7 @@ export const withMention = <
     options: { id, trigger, inputCreation },
   }: WithPlatePlugin<MentionPlugin, V, E>
 ) => {
+  console.log("withMention");
   const { type } = getPlugin<{}, V>(editor, ELEMENT_MENTION_INPUT);
   var textSelected: any;
   const {
@@ -53,6 +54,7 @@ export const withMention = <
   };
 
   editor.insertFragment = (fragment) => {
+    console.log("withMention insertFragment");
     const inMentionInput = findMentionInput(editor) !== undefined;
 
     if (!inMentionInput) {
@@ -78,7 +80,7 @@ export const withMention = <
     }
 
     editor.insertText(stripNewLineAndTrim(text));
-    // textSelected = editor.insertText(stripNewLineAndTrim(text));
+    console.log("withMention insertTextData");
 
     return true;
   };
@@ -88,6 +90,7 @@ export const withMention = <
     if (currentMentionInput && getNodeString(currentMentionInput[0]) === "") {
       return removeMentionInput(editor, currentMentionInput[1]);
     }
+    console.log("withMention deleteBackward");
 
     deleteBackward(unit);
   };
@@ -96,11 +99,14 @@ export const withMention = <
     if (isSelectionInMentionInput(editor)) {
       return;
     }
+    console.log("withMention insertBreak");
 
     insertBreak();
   };
 
   editor.insertText = (text) => {
+    console.log("withMention insertText");
+
     if (
       !editor.selection ||
       text !== trigger ||
@@ -149,12 +155,15 @@ export const withMention = <
       // return;
       return insertNodes<TMentionInputElement>(editor, data);
     }
+
     return _insertText(text);
     // return;
     // _insertText(text);
   };
 
   editor.apply = (operation) => {
+    console.log("withMention apply");
+
     apply(operation);
 
     if (operation.type === "insert_text" || operation.type === "remove_text") {

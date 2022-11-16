@@ -21,11 +21,26 @@ import {
   withoutNormalizing,
   setNodes,
 } from "@udecode/plate-core";
-import { getPluginType, ELEMENT_UL, toggleIndentList } from "@udecode/plate";
+import {
+  getPluginType,
+  ELEMENT_UL,
+  toggleIndentList,
+  getPreventDefaultHandler,
+  // toggleMark,
+  isMarkActive,
+  Simplify,
+  TEditor,
+  TextOf,
+  UnionToIntersection,
+  MARK_BOLD,
+} from "@udecode/plate";
 
-import { Transforms } from "slate";
 import { ELEMENT_MENTION, ELEMENT_MENTION_INPUT } from "./createMentionPlugin";
 import { MentionPlugin, TMentionElement } from "./types";
+import { clear } from "@testing-library/user-event/dist/clear";
+import { useSlate } from "slate-react";
+import { toggleMark } from "@udecode/slate-plugins";
+import { Transforms } from "slate";
 
 export interface CreateMentionNode<TData extends Data> {
   (
@@ -43,7 +58,7 @@ export const getMentionOnSelectItem =
     key = ELEMENT_MENTION,
   }: PlatePluginKey = {}): ComboboxOnSelectItem<TData> =>
   (editor, item) => {
-    console.log("item-", item);
+    console.log("getMentionOnSelectItem");
     const targetRange = comboboxSelectors.targetRange();
     if (!targetRange) return;
 
@@ -59,9 +74,6 @@ export const getMentionOnSelectItem =
       isEndPoint(editor, editor.selection.anchor, pathAbove);
 
     withoutNormalizing(editor, () => {
-      // Selectors are sensitive to operations, it's better to create everything
-      // before the editor state is changed. For example, asking for text after
-      // removeNodes below will return null.
       const props = createMentionNode!(item, {
         search: comboboxSelectors.text() ?? "",
       });
@@ -73,7 +85,6 @@ export const getMentionOnSelectItem =
           match: (node) => node.type === ELEMENT_MENTION_INPUT,
         })
       );
-      console.log("porp inside", props);
 
       if (
         props.value === "bold" ||
@@ -82,11 +93,20 @@ export const getMentionOnSelectItem =
         props.value === "strikethrough" ||
         props.value === "code"
       ) {
-        insertNodes<TMentionElement>(editor, {
-          type: "p",
-          children: [{ text: "", [`${props.value}`]: true }],
-          // ...props,
-        } as TMentionElement);
+        const type = getPluginType(editor, MARK_BOLD);
+        console.log(
+          "  ="
+          // getPreventDefaultHandler(toggleMark, editor, { key: type })
+        );
+        // const editorss = useSlate();
+        editor.addMark(props.value, true);
+        // Editor.addMark(editor, getPluginType(editor, MARK_BOLD), true);
+        // toggleMark(editor, props.value);
+        // insertNodes<TMentionElement>(editor, {
+        //   type: "p",
+        //   children: [{ text: "", [`${props.value}`]: true }],
+        // } as TMentionElement);
+        console.log("insertSpaceAfterMention", insertSpaceAfterMention);
       } else if (props.value === "ul") {
         toggleIndentList(editor, {
           listStyleType: "disc",
@@ -94,34 +114,18 @@ export const getMentionOnSelectItem =
         insertNodes<TMentionElement>(editor, {
           type: getPluginType(editor, ELEMENT_UL),
           children: [{ type: "li", text: "" }],
-          // children: [
-          //   [
-          //     {
-          //       children: [
-          //         {
-          //           type: "lic",
-          //           children: [{ text: "" }],
-          //         },
-          //       ],
-          //       type: "li",
-          //     },
-          //   ],
-          // ],
-          // ...props,
         } as unknown as TMentionElement);
       } else {
-        insertNodes<TMentionElement>(editor, {
-          type: `${props.value}`,
-          children: [{ text: "" }],
-          // ...props,
-        } as TMentionElement);
-      }
-      // move the selection after the element
-      // moveSelection(editor, { unit: "offset" });
+        // const editorss = useSlate();
 
-      // if (isBlockEnd() && insertSpaceAfterMention) {
-      //   insertText(editor, " ");
-      // }
+        Transforms.setNodes(editor as any, { type: props.value } as any);
+        // setNodes(editor, getPluginType(editor, props.value));
+        // insertNodes<TMentionElement>(editor, {
+        //   type: `${props.value}`,
+        //   children: [{ text: "" }],
+        //   // ...props,
+        // } as TMentionElement);
+      }
     });
 
     return comboboxActions.reset();

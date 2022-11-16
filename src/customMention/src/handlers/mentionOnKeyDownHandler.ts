@@ -12,6 +12,7 @@ export const mentionOnKeyDownHandler: <V extends Value>(
   options?: MoveSelectionByOffsetOptions<V>
 ) => (editor: PlateEditor<V>) => KeyboardEventHandler =
   (options) => (editor) => (event) => {
+    console.log("mentionOnKeyDownHandler");
     if (isHotkey("escape", event)) {
       event.preventDefault();
       const currentMentionInput = findMentionInput(editor)!;
